@@ -5,8 +5,30 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="common.css">
     <title>16 Bit One's Complement Adder</title>
+
+    <style>
+        #step1Carrydigit16,
+        #step2Bdigit0 {
+            border: 1px solid red;
+        }
+        
+        .addline {
+            border-bottom: 1px solid black;
+        }
+        
+        table {
+            border-collapse: collapse;
+        }
+        
+        .label {
+            width: 10em;
+        }
+        
+        td {
+            width: 0.5em;
+        }
+    </style>
 
     <script>
         function parse1k(numstr) {
@@ -109,14 +131,19 @@
 <body>
 
     <div>
+        <h1>Enter Numbers</h1>
+        <p>Both decimal and hexadecimal (via 0x prefix) are supported.</p>
+
         Number A:
         <input id="inA" type="text"><span id="parseErrorA"></span><br> Number B:
         <input id="inB" type="text"><span id="parseErrorB"></span><br>
         <button id="calculate" type="button" onclick="calculate()">Calculate!</button>
 
+        <h2>The Initial Addition</h2>
+
         <table>
             <tr>
-                <td>
+                <td class="label">
                     NumA
                 </td>
                 <td>
@@ -141,7 +168,7 @@
                 <td class="step1A" id="step1Adigit0"></td>
             </tr>
             <tr>
-                <td>
+                <td class="label">
                     NumB
                 </td>
                 <td>
@@ -165,8 +192,8 @@
                 <td class="step1B" id="step1Bdigit1"></td>
                 <td class="step1B" id="step1Bdigit0"></td>
             </tr>
-            <tr>
-                <td>
+            <tr class="addline">
+                <td class="label">
                     Carry
                 </td>
                 <td>
@@ -191,7 +218,7 @@
                 <td class="step1Carry" id="step1Carrydigit0"></td>
             </tr>
             <tr>
-                <td>
+                <td class="label">
                     Intermediate Result
                 </td>
                 <td>
@@ -217,9 +244,11 @@
             </tr>
         </table>
 
+        <h2>Taking the End-Arround Carry into Account</h2>
+
         <table>
             <tr>
-                <td>Intermediate Result</td>
+                <td class="label">Intermediate Result</td>
                 <td></td>
 
                 <td class="step2A" id="step2Adigit16"></td>
@@ -241,7 +270,7 @@
                 <td class="step2A" id="step2Adigit0"></td>
             </tr>
             <tr>
-                <td>Wraparound Carry</td>
+                <td class="label">End-Arround Carry</td>
                 <td>+</td>
 
                 <td class="step2B" id="step2Bdigit16"></td>
@@ -262,8 +291,8 @@
                 <td class="step2B" id="step2Bdigit1"></td>
                 <td class="step2B" id="step2Bdigit0"></td>
             </tr>
-            <tr>
-                <td>Carry</td>
+            <tr class="addline">
+                <td class="label">Carry</td>
                 <td></td>
 
                 <td class="step2Carry" id="step2Carrydigit16"></td>
@@ -285,7 +314,7 @@
                 <td class="step2Carry" id="step2Carrydigit0"></td>
             </tr>
             <tr>
-                <td>Result</td>
+                <td class="label">Result</td>
                 <td></td>
 
                 <td class="step2Result" id="step2Resultdigit16"></td>
@@ -307,6 +336,8 @@
                 <td class="step2Result" id="step2Resultdigit0"></td>
             </tr>
         </table>
+
+        <h1>The Result</h1>
 
         Result (signed): <span id="finalResultSigned"></span><br> Result (unsigned): <span id="finalResultUnsigned"></span><br>
 
