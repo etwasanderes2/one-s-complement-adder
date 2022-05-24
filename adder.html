@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16 Bit One's Complement Adder</title>
+
+    <script>
+        function parse1k(numstr) {
+            const trimstr = numstr.replace(' ', '')
+            const number = Math.abs(parseInt(trimstr))
+            if (isNaN(number)) {
+                const error = 'Could not parse Number "' + trimstr + '"'
+                console.warn(error)
+                return error
+            }
+            if (number > 0x7fff) {
+                const error = 'Number out too large / small. abs(number) must be less than ' + 0x7fff + ' but is ' + number
+                console.warn(error)
+                return error
+            }
+            const negnum = trimstr.startsWith('-') ? ~number : number
+            return negnum & 0xFFFF
+        }
+
+        function add1kStep(numA, numB) {
+            result = numA + numB
+            carry = numA ^ numB ^ result
+            return {
+                'result': result,
+                'carry': carry
+            }
+        }
+
+        function writeNumber(num, rowId, digits) {
+            for (let i = 0; i <= digits; i++) {
+                document.getElementById(rowId + 'digit' + i).innerText = (num & 1).toString(2)
+                num >>= 1
+            }
+        }
+
+        function convertFrom1k(num) {
+            const neg = (num & 0x8000 ? '-' + (~num & 0xffff) : '' + num & 0xffff)
+            return neg
+        }
+
+        function calculate() {
+            // parse Numbers
+            const numA = parse1k(document.getElementById('inA').value)
+            document.getElementById('parseErrorA').innerText = typeof numA === "string" ? numA : ""
+            const numB = parse1k(document.getElementById('inB').value)
+            document.getElementById('parseErrorB').innerText = typeof numB === "string" ? numB : ""
+
+            if (typeof(numA) !== "number" || typeof(numB) !== "number") {
+                return
+            }
+
+            console.log("Number parsing successful, adding now! " + "A: " + numA.toString(2) + " B: " + numB.toString(2))
+
+            writeNumber(numA, 'step1A', 15)
+            writeNumber(numB, 'step1B', 15)
+
+            // add first step
+            const r1 = add1kStep(numA, numB)
+
+            console.log("intermediate result: " + r1.result.toString(2) + " carry: " + r1.carry.toString(2))
+
+            writeNumber(r1.carry, 'step1Carry', 16)
+            writeNumber(r1.result, 'step1Result', 15)
+
+            // fill in second step
+            writeNumber(r1.result, 'step2A', 15)
+            writeNumber(r1.carry >> 16, 'step2B', 0)
+
+            // add second step
+            const r2 = add1kStep(r1.result, r1.carry >> 16)
+
+            console.log("final result: " + r2.result.toString(2) + " carry: " + r2.carry.toString(2))
+
+            writeNumber(r2.carry, 'step2Carry', 16)
+            writeNumber(r2.result, 'step2Result', 15)
+
+            // convert result
+            const finalResult = convertFrom1k(r2.result)
+            document.getElementById('finalResult').innerText = finalResult
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <div>
+        Number A:
+        <input id="inA" type="text"><span id="parseErrorA"></span><br> Number B:
+        <input id="inB" type="text"><span id="parseErrorB"></span><br>
+        <button id="calculate" type="button" onclick="calculate()">Calculate!</button>
+
+        <table>
+            <tr>
+                <td>
+                    NumA
+                </td>
+                <td>
+                    <!-- empty -->
+                </td>
+                <td class="step1A" id="step1Adigit16"></td>
+                <td class="step1A" id="step1Adigit15"></td>
+                <td class="step1A" id="step1Adigit14"></td>
+                <td class="step1A" id="step1Adigit13"></td>
+                <td class="step1A" id="step1Adigit12"></td>
+                <td class="step1A" id="step1Adigit11"></td>
+                <td class="step1A" id="step1Adigit10"></td>
+                <td class="step1A" id="step1Adigit9"></td>
+                <td class="step1A" id="step1Adigit8"></td>
+                <td class="step1A" id="step1Adigit7"></td>
+                <td class="step1A" id="step1Adigit6"></td>
+                <td class="step1A" id="step1Adigit5"></td>
+                <td class="step1A" id="step1Adigit4"></td>
+                <td class="step1A" id="step1Adigit3"></td>
+                <td class="step1A" id="step1Adigit2"></td>
+                <td class="step1A" id="step1Adigit1"></td>
+                <td class="step1A" id="step1Adigit0"></td>
+            </tr>
+            <tr>
+                <td>
+                    NumB
+                </td>
+                <td>
+                    +
+                </td>
+                <td class="step1B" id="step1Bdigit16"></td>
+                <td class="step1B" id="step1Bdigit15"></td>
+                <td class="step1B" id="step1Bdigit14"></td>
+                <td class="step1B" id="step1Bdigit13"></td>
+                <td class="step1B" id="step1Bdigit12"></td>
+                <td class="step1B" id="step1Bdigit11"></td>
+                <td class="step1B" id="step1Bdigit10"></td>
+                <td class="step1B" id="step1Bdigit9"></td>
+                <td class="step1B" id="step1Bdigit8"></td>
+                <td class="step1B" id="step1Bdigit7"></td>
+                <td class="step1B" id="step1Bdigit6"></td>
+                <td class="step1B" id="step1Bdigit5"></td>
+                <td class="step1B" id="step1Bdigit4"></td>
+                <td class="step1B" id="step1Bdigit3"></td>
+                <td class="step1B" id="step1Bdigit2"></td>
+                <td class="step1B" id="step1Bdigit1"></td>
+                <td class="step1B" id="step1Bdigit0"></td>
+            </tr>
+            <tr>
+                <td>
+                    Carry
+                </td>
+                <td>
+                    <!-- empty -->
+                </td>
+                <td class="step1Carry" id="step1Carrydigit16"></td>
+                <td class="step1Carry" id="step1Carrydigit15"></td>
+                <td class="step1Carry" id="step1Carrydigit14"></td>
+                <td class="step1Carry" id="step1Carrydigit13"></td>
+                <td class="step1Carry" id="step1Carrydigit12"></td>
+                <td class="step1Carry" id="step1Carrydigit11"></td>
+                <td class="step1Carry" id="step1Carrydigit10"></td>
+                <td class="step1Carry" id="step1Carrydigit9"></td>
+                <td class="step1Carry" id="step1Carrydigit8"></td>
+                <td class="step1Carry" id="step1Carrydigit7"></td>
+                <td class="step1Carry" id="step1Carrydigit6"></td>
+                <td class="step1Carry" id="step1Carrydigit5"></td>
+                <td class="step1Carry" id="step1Carrydigit4"></td>
+                <td class="step1Carry" id="step1Carrydigit3"></td>
+                <td class="step1Carry" id="step1Carrydigit2"></td>
+                <td class="step1Carry" id="step1Carrydigit1"></td>
+                <td class="step1Carry" id="step1Carrydigit0"></td>
+            </tr>
+            <tr>
+                <td>
+                    Intermediate Result
+                </td>
+                <td>
+                    <!-- empty -->
+                </td>
+                <td class="step1Result" id="step1Resultdigit16"></td>
+                <td class="step1Result" id="step1Resultdigit15"></td>
+                <td class="step1Result" id="step1Resultdigit14"></td>
+                <td class="step1Result" id="step1Resultdigit13"></td>
+                <td class="step1Result" id="step1Resultdigit12"></td>
+                <td class="step1Result" id="step1Resultdigit11"></td>
+                <td class="step1Result" id="step1Resultdigit10"></td>
+                <td class="step1Result" id="step1Resultdigit9"></td>
+                <td class="step1Result" id="step1Resultdigit8"></td>
+                <td class="step1Result" id="step1Resultdigit7"></td>
+                <td class="step1Result" id="step1Resultdigit6"></td>
+                <td class="step1Result" id="step1Resultdigit5"></td>
+                <td class="step1Result" id="step1Resultdigit4"></td>
+                <td class="step1Result" id="step1Resultdigit3"></td>
+                <td class="step1Result" id="step1Resultdigit2"></td>
+                <td class="step1Result" id="step1Resultdigit1"></td>
+                <td class="step1Result" id="step1Resultdigit0"></td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <td>Intermediate Result</td>
+                <td></td>
+
+                <td class="step2A" id="step2Adigit16"></td>
+                <td class="step2A" id="step2Adigit15"></td>
+                <td class="step2A" id="step2Adigit14"></td>
+                <td class="step2A" id="step2Adigit13"></td>
+                <td class="step2A" id="step2Adigit12"></td>
+                <td class="step2A" id="step2Adigit11"></td>
+                <td class="step2A" id="step2Adigit10"></td>
+                <td class="step2A" id="step2Adigit9"></td>
+                <td class="step2A" id="step2Adigit8"></td>
+                <td class="step2A" id="step2Adigit7"></td>
+                <td class="step2A" id="step2Adigit6"></td>
+                <td class="step2A" id="step2Adigit5"></td>
+                <td class="step2A" id="step2Adigit4"></td>
+                <td class="step2A" id="step2Adigit3"></td>
+                <td class="step2A" id="step2Adigit2"></td>
+                <td class="step2A" id="step2Adigit1"></td>
+                <td class="step2A" id="step2Adigit0"></td>
+            </tr>
+            <tr>
+                <td>Wraparound Carry</td>
+                <td>+</td>
+
+                <td class="step2B" id="step2Bdigit16"></td>
+                <td class="step2B" id="step2Bdigit15"></td>
+                <td class="step2B" id="step2Bdigit14"></td>
+                <td class="step2B" id="step2Bdigit13"></td>
+                <td class="step2B" id="step2Bdigit12"></td>
+                <td class="step2B" id="step2Bdigit11"></td>
+                <td class="step2B" id="step2Bdigit10"></td>
+                <td class="step2B" id="step2Bdigit9"></td>
+                <td class="step2B" id="step2Bdigit8"></td>
+                <td class="step2B" id="step2Bdigit7"></td>
+                <td class="step2B" id="step2Bdigit6"></td>
+                <td class="step2B" id="step2Bdigit5"></td>
+                <td class="step2B" id="step2Bdigit4"></td>
+                <td class="step2B" id="step2Bdigit3"></td>
+                <td class="step2B" id="step2Bdigit2"></td>
+                <td class="step2B" id="step2Bdigit1"></td>
+                <td class="step2B" id="step2Bdigit0"></td>
+            </tr>
+            <tr>
+                <td>Carry</td>
+                <td></td>
+
+                <td class="step2Carry" id="step2Carrydigit16"></td>
+                <td class="step2Carry" id="step2Carrydigit15"></td>
+                <td class="step2Carry" id="step2Carrydigit14"></td>
+                <td class="step2Carry" id="step2Carrydigit13"></td>
+                <td class="step2Carry" id="step2Carrydigit12"></td>
+                <td class="step2Carry" id="step2Carrydigit11"></td>
+                <td class="step2Carry" id="step2Carrydigit10"></td>
+                <td class="step2Carry" id="step2Carrydigit9"></td>
+                <td class="step2Carry" id="step2Carrydigit8"></td>
+                <td class="step2Carry" id="step2Carrydigit7"></td>
+                <td class="step2Carry" id="step2Carrydigit6"></td>
+                <td class="step2Carry" id="step2Carrydigit5"></td>
+                <td class="step2Carry" id="step2Carrydigit4"></td>
+                <td class="step2Carry" id="step2Carrydigit3"></td>
+                <td class="step2Carry" id="step2Carrydigit2"></td>
+                <td class="step2Carry" id="step2Carrydigit1"></td>
+                <td class="step2Carry" id="step2Carrydigit0"></td>
+            </tr>
+            <tr>
+                <td>Result</td>
+                <td></td>
+
+                <td class="step2Result" id="step2Resultdigit16"></td>
+                <td class="step2Result" id="step2Resultdigit15"></td>
+                <td class="step2Result" id="step2Resultdigit14"></td>
+                <td class="step2Result" id="step2Resultdigit13"></td>
+                <td class="step2Result" id="step2Resultdigit12"></td>
+                <td class="step2Result" id="step2Resultdigit11"></td>
+                <td class="step2Result" id="step2Resultdigit10"></td>
+                <td class="step2Result" id="step2Resultdigit9"></td>
+                <td class="step2Result" id="step2Resultdigit8"></td>
+                <td class="step2Result" id="step2Resultdigit7"></td>
+                <td class="step2Result" id="step2Resultdigit6"></td>
+                <td class="step2Result" id="step2Resultdigit5"></td>
+                <td class="step2Result" id="step2Resultdigit4"></td>
+                <td class="step2Result" id="step2Resultdigit3"></td>
+                <td class="step2Result" id="step2Resultdigit2"></td>
+                <td class="step2Result" id="step2Resultdigit1"></td>
+                <td class="step2Result" id="step2Resultdigit0"></td>
+            </tr>
+        </table>
+
+        Result: <span id="finalResult"></span>
+
+    </div>
+
+</body>
+
+</html>
