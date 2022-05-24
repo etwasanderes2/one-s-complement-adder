@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="common.css">
     <title>16 Bit One's Complement Adder</title>
 
     <script>
@@ -14,15 +15,27 @@
             if (isNaN(number)) {
                 const error = 'Could not parse Number "' + trimstr + '"'
                 console.warn(error)
-                return error
+                return [false, error]
             }
-            if (number > 0x7fff) {
-                const error = 'Number out too large / small. abs(number) must be less than ' + 0x7fff + ' but is ' + number
+            if (trimstr.startsWith('-')) {
+                // negative number, interpret as signed number
+                if (number > 0x7fff) {
+                    // too small (note that number is abs)
+                    const error = 'Number out too small. number must be greater than ' + -0x7fff + ' but is ' + (-number)
+                    console.warn(error)
+                    return [false, error]
+                } else {
+                    return [~number & 0xffff, 'Negative input, interpred as signed number']
+                }
+            } else if (number <= 0x7fff) {
+                return [number & 0xffff, '']
+            } else if (number <= 0xffff) {
+                return [number & 0xffff, 'Input outide of signed number range, interpreted as unsigned number']
+            } else {
+                const error = 'Number out too large. number must be at most ' + 0xffff + ' but is ' + number
                 console.warn(error)
-                return error
+                return [false, error]
             }
-            const negnum = trimstr.startsWith('-') ? ~number : number
-            return negnum & 0xFFFF
         }
 
         function add1kStep(numA, numB) {
@@ -41,17 +54,21 @@
             }
         }
 
-        function convertFrom1k(num) {
+        function convertFrom1kSigned(num) {
             const neg = (num & 0x8000 ? '-' + (~num & 0xffff) : '' + num & 0xffff)
             return neg
         }
 
+        function convertFrom1kUnsigned(num) {
+            return '' + num & 0xffff
+        }
+
         function calculate() {
             // parse Numbers
-            const numA = parse1k(document.getElementById('inA').value)
-            document.getElementById('parseErrorA').innerText = typeof numA === "string" ? numA : ""
-            const numB = parse1k(document.getElementById('inB').value)
-            document.getElementById('parseErrorB').innerText = typeof numB === "string" ? numB : ""
+            const [numA, errA] = parse1k(document.getElementById('inA').value)
+            document.getElementById('parseErrorA').innerText = errA
+            const [numB, errB] = parse1k(document.getElementById('inB').value)
+            document.getElementById('parseErrorB').innerText = errB
 
             if (typeof(numA) !== "number" || typeof(numB) !== "number") {
                 return
@@ -82,9 +99,8 @@
             writeNumber(r2.carry, 'step2Carry', 16)
             writeNumber(r2.result, 'step2Result', 15)
 
-            // convert result
-            const finalResult = convertFrom1k(r2.result)
-            document.getElementById('finalResult').innerText = finalResult
+            document.getElementById('finalResultSigned').innerText = convertFrom1kSigned(r2.result)
+            document.getElementById('finalResultUnsigned').innerText = convertFrom1kUnsigned(r2.result)
         }
     </script>
 
@@ -292,7 +308,7 @@
             </tr>
         </table>
 
-        Result: <span id="finalResult"></span>
+        Result (signed): <span id="finalResultSigned"></span><br> Result (unsigned): <span id="finalResultUnsigned"></span><br>
 
     </div>
 
