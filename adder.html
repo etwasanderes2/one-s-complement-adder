@@ -28,6 +28,24 @@
         td {
             width: 0.5em;
         }
+        
+        td:nth-last-child(8),
+        td:nth-last-child(16) {
+            border-left: 1px solid gray;
+        }
+        
+        td:nth-last-child(4),
+        td:nth-last-child(12) {
+            border-left: 1px dashed gray;
+        }
+        
+        .carryIn {
+            color: gray;
+        }
+        
+        .error {
+            margin-left: 1em;
+        }
     </style>
 
     <script>
@@ -124,6 +142,10 @@
             document.getElementById('finalResultSigned').innerText = convertFrom1kSigned(r2.result)
             document.getElementById('finalResultUnsigned').innerText = convertFrom1kUnsigned(r2.result)
         }
+
+        function submitOnEnter(target) {
+
+        }
     </script>
 
 </head>
@@ -135,16 +157,16 @@
         <p>Both decimal and hexadecimal (via 0x prefix) are supported.</p>
 
         Number A:
-        <input id="inA" type="text"><span id="parseErrorA"></span><br> Number B:
-        <input id="inB" type="text"><span id="parseErrorB"></span><br>
-        <button id="calculate" type="button" onclick="calculate()">Calculate!</button>
+        <input id="inA" type="text"><span class="error" id="parseErrorA"></span><br> Number B:
+        <input id="inB" type="text"><span class="error" id="parseErrorB"></span><br>
+        <button id="calculateButton" type="button" onclick="calculate()">Calculate!</button>
 
         <h2>The Initial Addition</h2>
 
         <table>
             <tr>
                 <td class="label">
-                    NumA
+                    Number A
                 </td>
                 <td>
                     <!-- empty -->
@@ -169,7 +191,7 @@
             </tr>
             <tr>
                 <td class="label">
-                    NumB
+                    Number B
                 </td>
                 <td>
                     +
@@ -215,7 +237,7 @@
                 <td class="step1Carry" id="step1Carrydigit3"></td>
                 <td class="step1Carry" id="step1Carrydigit2"></td>
                 <td class="step1Carry" id="step1Carrydigit1"></td>
-                <td class="step1Carry" id="step1Carrydigit0"></td>
+                <td class="step1Carry carryIn" id="step1Carrydigit0"></td>
             </tr>
             <tr>
                 <td class="label">
@@ -311,7 +333,7 @@
                 <td class="step2Carry" id="step2Carrydigit3"></td>
                 <td class="step2Carry" id="step2Carrydigit2"></td>
                 <td class="step2Carry" id="step2Carrydigit1"></td>
-                <td class="step2Carry" id="step2Carrydigit0"></td>
+                <td class="step2Carry carryIn" id="step2Carrydigit0"></td>
             </tr>
             <tr>
                 <td class="label">Result</td>
